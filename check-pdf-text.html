@@ -1,0 +1,52 @@
+<html>
+  <body>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+
+      .content {
+        margin-left: auto;
+        margin-right: auto;
+        background-color: #ddd;
+        border-radius: 3px;
+        padding: 10px 50px;
+        margin-top: 100px;
+      }
+
+      .check-form {
+        margin-top: 40px;
+      }
+
+      .url-input {
+        min-width: 300px;
+      }
+
+      .check-status {
+        margin-top: 20px;
+        background-color: #eee;
+        border-radius: 3px;
+        padding: 10px 2px;
+      }
+    </style>
+    <main class="content">
+      <h1>PDF text checker</h1>
+      <p>
+        Enter the URL of a PDF and click "Check PDF" to check whether it has
+        selectable text or whether it will need processing with an OCR tool.
+      </p>
+      <form class="check-form" action="#">
+        <label for="pdfUrlInput">PDF URL:</label>
+        <input
+          class="url-input"
+          id="pdfUrlInput"
+          value="https://arxiv.org/pdf/2010.00467.pdf"
+        />
+        <button id="checkPdfButton">Check PDF</button>
+        <div class="check-status" id="status"></div>
+      </form>
+
+      <script type="module" src="check-pdf-text.js"></script>
+    </main>
+  </body>
+</html>
