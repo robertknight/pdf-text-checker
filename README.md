@@ -8,6 +8,8 @@ A PDF that has selectable text is suitable for use with tools like [Hypothesis](
 PDFs without selectable text will require pre-processing with an
 [OCR](https://en.wikipedia.org/wiki/Optical_character_recognition) tool.
 
+**[➡️ View live demo](https://robertknight.github.io/pdf-text-checker/check-pdf-text.html)**
+
 ## Usage
 
 Start a local HTTP server with:
