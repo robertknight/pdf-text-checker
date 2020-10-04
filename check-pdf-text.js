@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function range(min, max) {
   const result = [];
@@ -27,18 +27,18 @@ async function loadPDFJS() {
     return window.pdfjsLib;
   }
 
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/pdfjs-dist@2.5.207/build/pdf.min.js';
+  const script = document.createElement("script");
+  script.src = "https://unpkg.com/pdfjs-dist@2.5.207/build/pdf.min.js";
 
   return new Promise((resolve, reject) => {
-    script.addEventListener('load', () => resolve(window.pdfjsLib));
-    script.addEventListener('error', e => reject(e.error));
+    script.addEventListener("load", () => resolve(window.pdfjsLib));
+    script.addEventListener("error", (e) => reject(e.error));
     document.body.appendChild(script);
   });
 }
 
 function showStatus(text) {
-  const statusEl = document.getElementById('status');
+  const statusEl = document.getElementById("status");
   statusEl.textContent = text;
 }
 
@@ -46,7 +46,7 @@ function showStatus(text) {
  * Check whether the PDF at `url` has text that PDF.js can extract.
  */
 async function checkPDFTextLayer(url) {
-  showStatus('Loading PDF library...');
+  showStatus("Loading PDF library...");
   const pdfjs = await loadPDFJS();
 
   showStatus(`Loading PDF from ${url}...`);
@@ -60,10 +60,10 @@ async function checkPDFTextLayer(url) {
     return;
   }
 
-  const getPageText = async index => {
+  const getPageText = async (index) => {
     const page = await doc.getPage(index + 1);
     const textContent = await page.getTextContent();
-    return textContent.items.map(it => it.str).join(' ');
+    return textContent.items.map((it) => it.str).join(" ");
   };
 
   // Check the first N pages. The number of pages checked is a balance between
@@ -74,19 +74,21 @@ async function checkPDFTextLayer(url) {
   let pageTexts;
 
   try {
-    pageTexts = await Promise.all(range(0, maxPages).map(i => getPageText(i)));
+    pageTexts = await Promise.all(
+      range(0, maxPages).map((i) => getPageText(i))
+    );
   } catch (err) {
     showStatus(`Unable to fetch text from pages: ${err}`);
     return;
   }
 
   // TODO - Add smarter text quality metrics here.
-  const hasText = pageTexts.some(pt => pt.length > 10);
+  const hasText = pageTexts.some((pt) => pt.length > 10);
 
   if (hasText) {
-    showStatus('PDF has extractable text');
+    showStatus("PDF has extractable text");
   } else {
-    showStatus('PDF does not have extractable text. You will need to OCR it.');
+    showStatus("PDF does not have extractable text. You will need to OCR it.");
   }
 }
 
