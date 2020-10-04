@@ -56,7 +56,9 @@ async function checkPDFTextLayer(url) {
   try {
     doc = await loadingTask.promise;
   } catch (err) {
-    showStatus(`Failed to load PDF: ${err}`);
+    // TODO - PDF.js seems not to provide useful error information with the
+    // promise rejection. We'll need to try to get that some other way.
+    showStatus(`Failed to load PDF${err ? `: ${err}` : ""}`);
     return;
   }
 
