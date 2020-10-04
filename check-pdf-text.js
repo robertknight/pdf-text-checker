@@ -17,6 +17,25 @@ function corsProxyUrl(url) {
 }
 
 /**
+ * Read the contents of a `File` into an `ArrayBuffer`.
+ *
+ * In most recent browsers (Chrome >= 76, Firefox >= 69) `file.arrayBuffer()`
+ * can be used. This is not supported in Safari (<= 14) though.
+ */
+async function readFileToArrayBuffer(file) {
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+    reader.onerror = (event) => {
+      reject(reader.error);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/**
  * Load the PDF.js library.
  *
  * Returns the entry point to the loaded library.
@@ -45,21 +64,41 @@ function showStatus(text) {
 /**
  * Check whether the PDF at `url` has text that PDF.js can extract.
  */
-async function checkPDFTextLayer(url) {
+async function checkPDFTextLayer(urlOrFile) {
   showStatus("Loading PDF library...");
   const pdfjs = await loadPDFJS();
 
-  showStatus(`Loading PDF from ${url}...`);
-  const loadingTask = pdfjs.getDocument(corsProxyUrl(url));
   let doc;
 
-  try {
-    doc = await loadingTask.promise;
-  } catch (err) {
-    // TODO - PDF.js seems not to provide useful error information with the
-    // promise rejection. We'll need to try to get that some other way.
-    showStatus(`Failed to load PDF${err ? `: ${err}` : ""}`);
-    return;
+  if (typeof urlOrFile === "string") {
+    showStatus(`Loading PDF from ${url}...`);
+    const url = urlOrFile;
+    const loadingTask = pdfjs.getDocument(corsProxyUrl(url));
+
+    try {
+      doc = await loadingTask.promise;
+    } catch (err) {
+      // TODO - PDF.js seems not to provide useful error information with the
+      // promise rejection. We'll need to try to get that some other way.
+      showStatus(`Failed to load PDF${err ? `: ${err}` : ""}`);
+      return;
+    }
+  } else {
+    const file = urlOrFile;
+
+    showStatus(`Loading PDF from ${file.name}`);
+
+    const fileData = await readFileToArrayBuffer(file);
+    const loadingTask = pdfjs.getDocument(fileData);
+
+    try {
+      doc = await loadingTask.promise;
+    } catch (err) {
+      // TODO - PDF.js seems not to provide useful error information with the
+      // promise rejection. We'll need to try to get that some other way.
+      showStatus(`Failed to load PDF${err ? `: ${err}` : ""}`);
+      return;
+    }
   }
 
   const getPageText = async (index) => {
@@ -93,6 +132,29 @@ async function checkPDFTextLayer(url) {
     showStatus("PDF does not have extractable text. You will need to OCR it.");
   }
 }
+
+const dropZone = document.getElementById("pdfDropZone");
+dropZone.ondragover = (event) => {
+  event.preventDefault();
+  dropZone.classList.add("has-pending-drop");
+};
+dropZone.ondragleave = (event) => {
+  dropZone.classList.remove("has-pending-drop");
+};
+
+dropZone.ondrop = (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("has-pending-drop");
+
+  for (let item of event.dataTransfer.items) {
+    if (item.kind !== "file") {
+      continue;
+    }
+
+    const file = item.getAsFile();
+    checkPDFTextLayer(file);
+  }
+};
 
 const checkForm = document.getElementById("checkPdfForm");
 checkForm.onsubmit = (event) => {
