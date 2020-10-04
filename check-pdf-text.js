@@ -90,8 +90,9 @@ async function checkPDFTextLayer(url) {
   }
 }
 
-const checkButton = document.getElementById('checkPdfButton');
-checkButton.onclick = () => {
-  const url = document.getElementById('pdfUrlInput').value;
+const checkForm = document.getElementById("checkPdfForm");
+checkForm.onsubmit = (event) => {
+  event.preventDefault();
+  const url = document.getElementById("pdfUrlInput").value;
   checkPDFTextLayer(url);
 };

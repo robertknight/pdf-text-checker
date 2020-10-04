@@ -35,14 +35,14 @@
         Enter the URL of a PDF and click "Check PDF" to check whether it has
         selectable text or whether it will need processing with an OCR tool.
       </p>
-      <form class="check-form" action="#">
+      <form class="check-form" id="checkPdfForm">
         <label for="pdfUrlInput">PDF URL:</label>
         <input
           class="url-input"
           id="pdfUrlInput"
           value="https://arxiv.org/pdf/2010.00467.pdf"
         />
-        <button id="checkPdfButton">Check PDF</button>
+        <button>Check PDF</button>
         <div class="check-status" id="status"></div>
       </form>
 
